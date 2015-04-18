@@ -16,12 +16,9 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, generators, nested_scopes
-from __future__ import print_function, unicode_literals, with_statement
-
 import csv
 
-class Table(tuple):
+class Table(object):
     """
     Immutable table with header.
 
@@ -34,11 +31,10 @@ class Table(tuple):
     ('Alex', 'Brown', 'Moscow')
     """
 
-    def __new__(cls, table):
+    def __init__(self, table):
         table = tuple(tuple(row) for row in table)
-        self = super(Table, cls).__new__(cls, table[1:])
+        self.body = table[1:]
         self.header = table[0]
-        return self
 
     def __str__(self):
         width = len(self.header)
@@ -58,7 +54,14 @@ class Table(tuple):
         return header + '\n' + '-' * len(header) + '\n' + body
 
     def __repr__(self):
-        return 'Table(' + str((self.header,) + tuple(self)) + ')'
+        tuple_repr = repr((self.header,) + tuple(self))
+        return type(self).__name__ + '(' + tuple_repr + ')'
+
+    def __getitem__(self, key):
+        if type(key) is int:
+            return self.body[key]
+        else: # type(key) is slice
+            return type(self)((self.header,) + self.body[key])
 
     def split_by_column(self, index):
         cases = set(row[index] for row in self)

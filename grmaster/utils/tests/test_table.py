@@ -20,9 +20,6 @@ Test cases for utils.
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, generators, nested_scopes
-from __future__ import print_function, unicode_literals, with_statement
-
 from pytest import raises
 
 from grmaster.utils import Table
@@ -30,30 +27,30 @@ from grmaster.utils import Table
 table_tuple = (('Name', 'Surname', 'City'),
                ('Alex', 'Brown', 'Moscow'),
                ('John', 'Smith', 'Moscow'),
-               ('Ed', 'Wood', 'Hollywood'))
+               ('Эд', 'Wood', 'Hollywood')) # Testing unicode
 
 table_str = """| Name | Surname | City      |
 ------------------------------
 | Alex | Brown   | Moscow    |
 | John | Smith   | Moscow    |
-| Ed   | Wood    | Hollywood |"""
+| Эд   | Wood    | Hollywood |"""
 
 table_partition = ((('Alex', 'Brown', 'Moscow'), ('John', 'Smith', 'Moscow')),
-                   (('Ed', 'Wood', 'Hollywood'),))
+                   (('Эд', 'Wood', 'Hollywood'),))
 
 def test_table_new():
     table = Table(table_tuple)
     assert(table.header == table_tuple[0])
-    assert(table == table_tuple[1:])
+    assert(tuple(table) == table_tuple[1:])
 
 
 def test_from_file(tmpdir):
     table_file = tmpdir.join('table.csv')
-    table_file.write("Name,Surname,City\nAlex,Brown,Moscow\n" +
-                     "John,Smith,Moscow\nEd,Wood,Hollywood")
+    table_file.write(('Name,Surname,City\nAlex,Brown,Moscow\n' +
+                      'John,Smith,Moscow\nЭд,Wood,Hollywood'))
     table = Table.from_file(str(table_file))
     assert(table.header == table_tuple[0])
-    assert(table == table_tuple[1:])
+    assert(tuple(table) == table_tuple[1:])
 
 
 class TestTable(object):
@@ -64,6 +61,10 @@ class TestTable(object):
 class TestMagic(TestTable):
     def test_table_str(self):
         assert(str(self.table) == table_str)
+
+    def test_table_slice(self):
+        assert(type(self.table[:-1]) is Table)
+        assert(tuple(self.table[:-1]) == table_tuple[1:-1])
 
     def test_table_repr(self):
         table_repr = 'Table(' + str(table_tuple) + ')'
