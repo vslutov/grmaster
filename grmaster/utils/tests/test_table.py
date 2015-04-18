@@ -35,6 +35,11 @@ table_str = """| Name | Surname | City      |
 | John | Smith   | Moscow    |
 | Эд   | Wood    | Hollywood |"""
 
+table_csv = """Name,Surname,City
+Alex,Brown,Moscow
+John,Smith,Moscow
+Эд,Wood,Hollywood"""
+
 table_partition = ((('Alex', 'Brown', 'Moscow'), ('John', 'Smith', 'Moscow')),
                    (('Эд', 'Wood', 'Hollywood'),))
 
@@ -44,11 +49,16 @@ def test_table_new():
     assert(tuple(table) == table_tuple[1:])
 
 
-def test_from_file(tmpdir):
+def test_from_csv_file(tmpdir):
     table_file = tmpdir.join('table.csv')
-    table_file.write(('Name,Surname,City\nAlex,Brown,Moscow\n' +
-                      'John,Smith,Moscow\nЭд,Wood,Hollywood'))
-    table = Table.from_file(str(table_file))
+    table_file.write(table_csv)
+    table = Table.from_csv_file(str(table_file))
+    assert(table.header == table_tuple[0])
+    assert(tuple(table) == table_tuple[1:])
+
+
+def test_from_csv_str():
+    table = Table.from_csv_str(table_csv)
     assert(table.header == table_tuple[0])
     assert(tuple(table) == table_tuple[1:])
 
@@ -81,3 +91,7 @@ class TestMethods(TestTable):
         assert(partition == table_partition)
         partition = tuple(sorted(self.table.split_by_header('City')))
         assert(partition == table_partition)
+
+
+    def test_table_to_csv(self):
+        assert(self.table.to_csv() == table_csv)

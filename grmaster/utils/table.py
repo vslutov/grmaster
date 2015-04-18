@@ -16,7 +16,7 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import csv
+import csv, tempfile
 
 class Table(object):
     """
@@ -72,8 +72,25 @@ class Table(object):
     def split_by_header(self, header):
         return self.split_by_column(self.header.index(header))
 
-    def from_file(filename):
-        input_file = open(filename, 'r')
+    def to_csv(self):
+        row_to_csv = lambda row: ','.join(row)
+        return (row_to_csv(self.header) + '\n' +
+                '\n'.join(row_to_csv(row) for row in self))
+
+    def from_csv_str(csv_str):
+        temp_file = tempfile.SpooledTemporaryFile(10 ** 6, 'w+') # Max is 1 MB
+        temp_file.write(csv_str)
+        temp_file.seek(0)
+        table = Table.from_csv_file(temp_file)
+        temp_file.close()
+        return table
+
+    def from_csv_file(input_file):
+        opened = False
+        if type(input_file) is str:
+            opened = True
+            input_file = open(input_file, 'r')
         table = Table(csv.reader(input_file))
-        input_file.close()
+        if opened:
+            input_file.close()
         return table
