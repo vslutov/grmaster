@@ -20,9 +20,6 @@ Models of groups, streams, partitions etc.
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import, division, generators, nested_scopes
-from __future__ import print_function, unicode_literals, with_statement
-
 from .utils import Table
 
 class Group(list):
