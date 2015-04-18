@@ -84,6 +84,13 @@ class TestMagic(TestTable):
         with raises(TypeError):
             self.table[0] = self.table[1]
 
+    def test_len(self):
+        assert(len(self.table) == len(table_tuple) - 1)
+
+    def test_eq(self):
+        other = Table(table_tuple)
+        assert(self.table == other)
+
 
 class TestMethods(TestTable):
     def test_table_split(self):

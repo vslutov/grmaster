@@ -63,6 +63,12 @@ class Table(object):
         else: # type(key) is slice
             return type(self)((self.header,) + self.body[key])
 
+    def __len__(self):
+        return len(self.body)
+
+    def __eq__(self, other):
+        return repr(self) == repr(other)
+
     def split_by_column(self, index):
         cases = set(row[index] for row in self)
         return (tuple(filter(lambda row: row[index] == case,
