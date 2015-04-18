@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Usefull utils for dividing.
+Usefull utilities.
 """
 
 #   group-master - tool for divide students into groups
@@ -23,29 +23,7 @@ Usefull utils for dividing.
 from __future__ import absolute_import, division, generators, nested_scopes
 from __future__ import print_function, unicode_literals, with_statement
 
-import csv
+from .table import Table
 
-class Table(object):
-    def __init__(self, table):
-        table = tuple(tuple(row) for row in table)
-        self.headers = table[0]
-        self.body = table[1:]
+__all__ = ["Table"]
 
-    def __len__(self):
-        return len(self.body)
-
-    def split_by_column(self, index):
-        cases = set([student[index] for student in self.body])
-        return [list(filter(lambda student: student[index] == case,
-                            self.body))
-                for case in cases]
-
-    def split_by_header(self, header):
-        print(header)
-        return self.split_by_column(self.headers.index(header))
-
-    def from_file(filename):
-        input_file = open(filename, 'r')
-        table = Table(csv.reader(input_file))
-        input_file.close()
-        return table
