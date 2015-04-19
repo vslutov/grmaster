@@ -74,10 +74,14 @@ class Table(object):
         return repr(self) == repr(other)
 
     def split_by_column(self, index):
+        """Split by index (int)"""
         cases = set(row[index] for row in self)
-        return (tuple(filter(lambda row: row[index] == case,
-                             self))
-                for case in cases)
+        result = tuple()
+        for case in cases:
+            rows = tuple(row for row in self if row[index] == case)
+            result = result + (Table((self.header,) + rows),)
+
+        return result
 
     def split_by_header(self, header):
         return self.split_by_column(self.header.index(header))

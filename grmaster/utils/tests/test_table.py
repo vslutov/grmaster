@@ -23,81 +23,86 @@ Test cases for utils.
 from pytest import raises
 from grmaster.utils import Table
 
-table_tuple = (('Name', 'Surname', 'City'),
+TABLE_TUPLE = (('Name', 'Surname', 'City'),
                ('Alex', 'Brown', 'Moscow'),
                ('John', 'Smith', 'Moscow'),
                ('Эд', 'Wood', 'Hollywood'))  # Testing unicode
 
-table_str = """| Name | Surname | City      |
+TABLE_STR = """| Name | Surname | City      |
 ------------------------------
 | Alex | Brown   | Moscow    |
 | John | Smith   | Moscow    |
 | Эд   | Wood    | Hollywood |"""
 
-table_csv = """Name,Surname,City
+TABLE_CSV = """Name,Surname,City
 Alex,Brown,Moscow
 John,Smith,Moscow
 Эд,Wood,Hollywood"""
 
-table_partition = ((('Alex', 'Brown', 'Moscow'), ('John', 'Smith', 'Moscow')),
+TABLE_PARTITION = ((('Alex', 'Brown', 'Moscow'), ('John', 'Smith', 'Moscow')),
                    (('Эд', 'Wood', 'Hollywood'),))
 
 
 def test_table_new():
-    table = Table(table_tuple)
-    assert(table.header == table_tuple[0])
-    assert(tuple(table) == table_tuple[1:])
+    table = Table(TABLE_TUPLE)
+    assert table.header == TABLE_TUPLE[0]
+    assert tuple(table) == TABLE_TUPLE[1:]
 
 
 def test_from_csv_file(tmpdir):
     table_file = tmpdir.join('table.csv')
-    table_file.write(table_csv)
+    table_file.write(TABLE_CSV)
     table = Table.from_csv_file(str(table_file))
-    assert(table.header == table_tuple[0])
-    assert(tuple(table) == table_tuple[1:])
+    assert table.header == TABLE_TUPLE[0]
+    assert tuple(table) == TABLE_TUPLE[1:]
 
 
 def test_from_csv_str():
-    table = Table.from_csv_str(table_csv)
-    assert(table.header == table_tuple[0])
-    assert(tuple(table) == table_tuple[1:])
+    table = Table.from_csv_str(TABLE_CSV)
+    assert table.header == TABLE_TUPLE[0]
+    assert tuple(table) == TABLE_TUPLE[1:]
 
 
-class TestTable(object):
+class TestTable:
+    table = None
     def setup(self):
-        self.table = Table(table_tuple)
+        self.table = Table(TABLE_TUPLE)
 
 
-class TestMagic(TestTable):
+class TestTableMagic(TestTable):
     def test_table_str(self):
-        assert(str(self.table) == table_str)
+        assert str(self.table) == TABLE_STR
 
     def test_table_slice(self):
-        assert(type(self.table[:-1]) is Table)
-        assert(tuple(self.table[:-1]) == table_tuple[1:-1])
+        assert isinstance(self.table[:-1], Table)
+        assert tuple(self.table[:-1]) == TABLE_TUPLE[1:-1]
 
     def test_table_repr(self):
-        table_repr = 'Table(' + str(table_tuple) + ')'
-        assert(repr(self.table) == table_repr)
+        table_repr = 'Table(' + str(TABLE_TUPLE) + ')'
+        assert repr(self.table) == table_repr
 
     def test_table_immutable(self):
         with raises(TypeError):
             self.table[0] = self.table[1]
 
     def test_len(self):
-        assert(len(self.table) == len(table_tuple) - 1)
+        assert len(self.table) == len(TABLE_TUPLE) - 1
 
     def test_eq(self):
-        other = Table(table_tuple)
-        assert(self.table == other)
+        other = Table(TABLE_TUPLE)
+        assert self.table == other
 
 
-class TestMethods(TestTable):
+class TestTableMethods(TestTable):
     def test_table_split(self):
-        partition = tuple(sorted(self.table.split_by_column(2)))
-        assert(partition == table_partition)
-        partition = tuple(sorted(self.table.split_by_header('City')))
-        assert(partition == table_partition)
+        partition = self.table.split_by_column(2)
+        sorted_partition = tuple(sorted(tuple(group) for group in partition))
+        assert isinstance(partition, tuple)
+        assert isinstance(partition[0], Table)
+        assert sorted_partition == TABLE_PARTITION
+        partition = self.table.split_by_header('City')
+        sorted_partition = tuple(sorted(tuple(group) for group in partition))
+        assert sorted_partition == TABLE_PARTITION
 
     def test_table_to_csv(self):
-        assert(self.table.to_csv() == table_csv)
+        assert self.table.to_csv() == TABLE_CSV
