@@ -26,4 +26,3 @@ from __future__ import print_function, unicode_literals, with_statement
 from .table import Table
 
 __all__ = ["Table"]
-

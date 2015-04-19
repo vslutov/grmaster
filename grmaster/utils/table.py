@@ -16,7 +16,9 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import csv, tempfile
+import csv
+import tempfile
+
 
 class Table(object):
     """
@@ -45,8 +47,10 @@ class Table(object):
                 column_lens[i] = max(column_lens[i], len(str(row[i])))
 
         def row_to_string(row):
-            """Convert table row to string"""
-            item = lambda i: str(row[i]).ljust(column_lens[i])
+            """Convert table row to string."""
+            def item(i):
+                """Nice looking."""
+                return str(row[i]).ljust(column_lens[i])
             return '| ' + ' | '.join(item(i) for i in range(width)) + ' |'
 
         header = row_to_string(self.header)
@@ -60,7 +64,7 @@ class Table(object):
     def __getitem__(self, key):
         if type(key) is int:
             return self.body[key]
-        else: # type(key) is slice
+        else:  # type(key) is slice
             return type(self)((self.header,) + self.body[key])
 
     def __len__(self):
@@ -79,12 +83,12 @@ class Table(object):
         return self.split_by_column(self.header.index(header))
 
     def to_csv(self):
-        row_to_csv = lambda row: ','.join(row)
+        def row_to_csv(row): return ','.join(row)
         return (row_to_csv(self.header) + '\n' +
                 '\n'.join(row_to_csv(row) for row in self))
 
     def from_csv_str(csv_str):
-        temp_file = tempfile.SpooledTemporaryFile(10 ** 6, 'w+') # Max is 1 MB
+        temp_file = tempfile.SpooledTemporaryFile(10 ** 6, 'w+')  # Max is 1 MB
         temp_file.write(csv_str)
         temp_file.seek(0)
         table = Table.from_csv_file(temp_file)

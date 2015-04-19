@@ -21,13 +21,12 @@ Test cases for utils.
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pytest import raises
-
 from grmaster.utils import Table
 
 table_tuple = (('Name', 'Surname', 'City'),
                ('Alex', 'Brown', 'Moscow'),
                ('John', 'Smith', 'Moscow'),
-               ('Эд', 'Wood', 'Hollywood')) # Testing unicode
+               ('Эд', 'Wood', 'Hollywood'))  # Testing unicode
 
 table_str = """| Name | Surname | City      |
 ------------------------------
@@ -42,6 +41,7 @@ John,Smith,Moscow
 
 table_partition = ((('Alex', 'Brown', 'Moscow'), ('John', 'Smith', 'Moscow')),
                    (('Эд', 'Wood', 'Hollywood'),))
+
 
 def test_table_new():
     table = Table(table_tuple)
@@ -98,7 +98,6 @@ class TestMethods(TestTable):
         assert(partition == table_partition)
         partition = tuple(sorted(self.table.split_by_header('City')))
         assert(partition == table_partition)
-
 
     def test_table_to_csv(self):
         assert(self.table.to_csv() == table_csv)

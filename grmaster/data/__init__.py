@@ -23,10 +23,9 @@ Standard test tables.
 import os
 from grmaster.utils import Table
 
-data_dir = os.path.abspath(os.path.dirname(__file__))
+DATA_DIR = os.path.abspath(os.path.dirname(__file__))
+
 
 def load(filename):
-    return Table.from_csv_file(os.path.join(data_dir, filename))
-
-def load_students():
-    return load('students.csv')
+    """Load file from test data dir by name."""
+    return Table.from_csv_file(os.path.join(DATA_DIR, filename))

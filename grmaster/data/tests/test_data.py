@@ -25,10 +25,7 @@ from grmaster.utils import Table
 
 
 def test_load():
+    """Test if wrong data folder."""
     table = data.load('students.csv')
-    assert(type(table) is Table)
-    assert(len(table) > 0)
-
-
-def test_load_students():
-    assert(data.load('students.csv') == data.load_students())
+    assert isinstance(table, Table)
+    assert len(table) > 0
