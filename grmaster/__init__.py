@@ -21,4 +21,4 @@
 from .table import Table
 from .manager import Manager
 
-__all__ = ['Table', 'Manager']
+__all__ = ('Table', 'Manager')

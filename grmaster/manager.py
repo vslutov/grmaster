@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-Intermediate form of information about students and groups.
-"""
+"""Intermediate form of information about students and groups."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -24,10 +22,16 @@ from .table import Table
 
 
 class Stream(list):
+
     """Stream is a list of groups."""
 
     def __repr__(self):
+        """Return repr(self)."""
         return 'Stream(' + super().__repr__() + ')'
+
+    def __contains__(self, student):
+        """Return student in self."""
+        return any(student in group for group in self)
 
     def get_students(self):
         """Get set of all students."""
@@ -41,20 +45,39 @@ class Stream(list):
         return sum(len(group) for group in self)
 
 class Manager:
-    """Manager is a list of streams."""
 
-    streams = None
+    """
+    Manager is a list of streams.
+
+    Manager() can be invoked with filename or Table argument.
+    """
+
+    streams = []
 
     def __init__(self, student_table):
+        """Initialize self.  See help(type(self)) for accurate signature."""
         if isinstance(student_table, Table):
             self.students = student_table
         else:
             self.students = Table.from_csv_file(student_table)
 
+    def setup_streams(self, streams_info):
+        """Set up stream size info."""
+        if self.streams == []:
+            for stream_info in streams_info:
+                self.streams.append(Stream(set() for i in range(stream_info)))
+        else:
+            raise TypeError('Streams have already set up')
+
     def get_student_count(self):
         """Can run only after stream_info_step."""
         return sum(stream.get_student_count for stream in self.streams)
 
+    def is_assigned(self, student):
+        """Return True, if student is assigned to some stream."""
+        return any(student in stream for stream in self.streams)
+
     # TODO: move to another file
     def english_rule(self, english_header):
+        """Split students by english knowledge."""
         aggregates = self.students.split_by_header(english_header)

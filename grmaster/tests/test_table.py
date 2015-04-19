@@ -49,7 +49,7 @@ def test_table_new():
     assert tuple(table) == TABLE_TUPLE[1:]
 
 
-def test_from_csv_file(tmpdir):
+def test_table_from_csv_file(tmpdir):
     table_file = tmpdir.join('table.csv')
     table_file.write(TABLE_CSV)
     table = Table.from_csv_file(str(table_file))
@@ -83,10 +83,10 @@ class TestTable:
         with raises(TypeError):
             self.table[0] = self.table[1]
 
-    def test_len(self):
+    def test_table_len(self):
         assert len(self.table) == len(TABLE_TUPLE) - 1
 
-    def test_eq(self):
+    def test_table_eq(self):
         other = Table(TABLE_TUPLE)
         assert self.table == other
 
