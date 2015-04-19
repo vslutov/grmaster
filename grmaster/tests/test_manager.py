@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for grmaster.manager."""
+"""Tests for grmaster.Manager."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -39,7 +39,7 @@ def test_manager_init(tmpdir):
 
 class TestManager:
 
-    """Tests for grmaster.manager."""
+    """Tests for grmaster.Manager."""
 
     manager = None
 
@@ -57,3 +57,19 @@ class TestManager:
         assert stream_list == [[set()] * 6] * 3
         with raises(TypeError):
             self.manager.setup_streams((6, 6, 7))
+
+    def test_manager_is_assigned(self):
+        """Constant method."""
+        self.manager.setup_streams((6, 6, 6))
+        self.manager.streams[1][3] |= {1, 2, 3}
+        assert self.manager.is_assigned(1)
+        assert self.manager.is_assigned(2)
+        assert self.manager.is_assigned(3)
+        assert not self.manager.is_assigned(4)
+        assert not self.manager.is_assigned(5)
+
+    def test_manager_get_student_count(self):
+        """Constant method."""
+        self.manager.setup_streams((6, 6, 6))
+        self.manager.streams[1][3] |= {1, 2, 3}
+        assert self.manager.get_student_count() == 3

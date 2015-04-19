@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tool for nice dividing students into groups."""
+"""Stream is a list of groups."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -18,8 +18,26 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .table import Table
-from .manager import Manager
-from .stream import Stream
 
-__all__ = ('Table', 'Manager', 'Stream')
+class Stream(list):
+
+    """Stream is a list of groups."""
+
+    def __repr__(self):
+        """Return repr(self)."""
+        return 'Stream(' + super().__repr__() + ')'
+
+    def __contains__(self, student):
+        """Return student in self."""
+        return any(student in group for group in self)
+
+    def get_students(self):
+        """Get set of all students."""
+        result = set()
+        for group in self:
+            result |= group
+        return result
+
+    def get_student_count(self):
+        """Return count of assigned students."""
+        return sum(len(group) for group in self)
