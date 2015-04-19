@@ -21,7 +21,7 @@ Test cases for utils.
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pytest import raises
-from grmaster.utils import Table
+from grmaster import Table
 
 TABLE_TUPLE = (('Name', 'Surname', 'City'),
                ('Alex', 'Brown', 'Moscow'),
@@ -68,8 +68,6 @@ class TestTable:
     def setup(self):
         self.table = Table(TABLE_TUPLE)
 
-
-class TestTableMagic(TestTable):
     def test_table_str(self):
         assert str(self.table) == TABLE_STR
 
@@ -92,8 +90,6 @@ class TestTableMagic(TestTable):
         other = Table(TABLE_TUPLE)
         assert self.table == other
 
-
-class TestTableMethods(TestTable):
     def test_table_split(self):
         partition = self.table.split_by_column(2)
         sorted_partition = tuple(sorted(tuple(group) for group in partition))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Intermediate form of information about groups (without rules).
+Intermediate form of information about students and groups.
 """
 
 #   group-master - tool for divide students into groups
@@ -20,29 +20,40 @@ Intermediate form of information about groups (without rules).
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .table import Table
+
 
 class Stream(list):
-    def __init__(self, size):
-        super(Stream, self).__init__(Group for i in range(size))
-        self.size = size
+    """Stream is a list of groups."""
 
+    def __repr__(self):
+        return 'Stream(' + super().__repr__() + ')'
 
-class Streams(list):
-    def __init__(self, stream_sizes):
-        super(Streams, self).__init__(Stream(size) for size in stream_sizes)
+    def get_students(self):
+        """Get set of all students."""
+        result = set()
+        for group in self:
+            result |= group
+        return result
 
-    def get_size(self):
+    def get_student_count(self):
+        """A part of student count."""
         return sum(len(group) for group in self)
 
+class Manager:
+    """Manager is a list of streams."""
 
-class Partition(object):
-    def __init__(self, student_table, stream_sizes):
-        if type(student_table) is Table:
+    streams = None
+
+    def __init__(self, student_table):
+        if isinstance(student_table, Table):
             self.students = student_table
         else:
-            self.students = Table.from_file(student_table)
-        self.total_groups = sum(stream_sizes)
-        self.streams = Streams(stream_sizes)
+            self.students = Table.from_csv_file(student_table)
+
+    def get_student_count(self):
+        """Can run only after stream_info_step."""
+        return sum(stream.get_student_count for stream in self.streams)
 
     # TODO: move to another file
     def english_rule(self, english_header):

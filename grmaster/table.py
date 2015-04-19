@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Immutable table with header."""
+
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
 #
@@ -19,8 +21,29 @@
 import csv
 import tempfile
 
+def _from_csv_str(csv_str):
+    """Convert from csv string with header."""
+    temp_file = tempfile.SpooledTemporaryFile(10 ** 6, 'w+')  # Max is 1 MB
+    temp_file.write(csv_str)
+    temp_file.seek(0)
+    table = Table.from_csv_file(temp_file)
+    temp_file.close()
+    return table
 
-class Table(object):
+def _from_csv_file(input_file):
+    """Read csv file with header."""
+    opened = False
+    if isinstance(input_file, str):
+        opened = True
+        input_file = open(input_file, 'r')
+    table = Table(csv.reader(input_file))
+    if opened:
+        input_file.close()
+    return table
+
+
+class Table:
+
     """
     Immutable table with header.
 
@@ -33,12 +56,17 @@ class Table(object):
     ('Alex', 'Brown', 'Moscow')
     """
 
+    from_csv_str = _from_csv_str
+    from_csv_file = _from_csv_file
+
     def __init__(self, table):
+        """Initialize self.  See help(type(self)) for accurate signature."""
         table = tuple(tuple(row) for row in table)
         self.body = table[1:]
         self.header = table[0]
 
     def __str__(self):
+        """Return str(self)."""
         width = len(self.header)
         column_lens = [len(head) for head in self.header]
 
@@ -58,23 +86,27 @@ class Table(object):
         return header + '\n' + '-' * len(header) + '\n' + body
 
     def __repr__(self):
+        """Return repr(self)."""
         tuple_repr = repr((self.header,) + tuple(self))
         return type(self).__name__ + '(' + tuple_repr + ')'
 
     def __getitem__(self, key):
-        if type(key) is int:
+        """Return self[key]."""
+        if isinstance(key, int):
             return self.body[key]
         else:  # type(key) is slice
             return type(self)((self.header,) + self.body[key])
 
     def __len__(self):
+        """Return len(self)."""
         return len(self.body)
 
     def __eq__(self, other):
+        """Return self == other."""
         return repr(self) == repr(other)
 
     def split_by_column(self, index):
-        """Split by index (int)"""
+        """Return a tuple of tables."""
         cases = set(row[index] for row in self)
         result = tuple()
         for case in cases:
@@ -84,27 +116,13 @@ class Table(object):
         return result
 
     def split_by_header(self, header):
+        """Return a tuple of tables."""
         return self.split_by_column(self.header.index(header))
 
     def to_csv(self):
-        def row_to_csv(row): return ','.join(row)
+        """Convert table to csv."""
+        def row_to_csv(row):
+            """Convert row to csv."""
+            return ','.join(row)
         return (row_to_csv(self.header) + '\n' +
                 '\n'.join(row_to_csv(row) for row in self))
-
-    def from_csv_str(csv_str):
-        temp_file = tempfile.SpooledTemporaryFile(10 ** 6, 'w+')  # Max is 1 MB
-        temp_file.write(csv_str)
-        temp_file.seek(0)
-        table = Table.from_csv_file(temp_file)
-        temp_file.close()
-        return table
-
-    def from_csv_file(input_file):
-        opened = False
-        if type(input_file) is str:
-            opened = True
-            input_file = open(input_file, 'r')
-        table = Table(csv.reader(input_file))
-        if opened:
-            input_file.close()
-        return table

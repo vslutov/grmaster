@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-Standard test tables.
-"""
+"""Standard test tables."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -21,7 +19,7 @@ Standard test tables.
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from grmaster.utils import Table
+from grmaster import Table
 
 DATA_DIR = os.path.abspath(os.path.dirname(__file__))
 

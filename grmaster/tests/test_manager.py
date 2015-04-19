@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Basic group type.
-
-It's not only academic group.
+Intermediate form of information about groups (without rules).
 """
 
 #   group-master - tool for divide students into groups
@@ -21,13 +19,3 @@ It's not only academic group.
 #
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-class Group(list):
-    def __init__(self, arg=[]):
-        if type(arg) is int:
-            super(Group, self).__init__()
-            self.max_size = arg
-        else:
-            super(Group, self).__init__(arg)
-            self.max_size = len(self)

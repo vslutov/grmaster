@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-Tests for standard test tables.
-"""
+"""Tests for standard test tables."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -20,8 +18,7 @@ Tests for standard test tables.
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster import data
-from grmaster.utils import Table
+from grmaster import data, Table
 
 
 def test_load():
