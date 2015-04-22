@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Standard test tables."""
+"""Standard test tables and other usefull stuff."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>

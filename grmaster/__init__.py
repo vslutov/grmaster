@@ -18,8 +18,6 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .table import Table
 from .manager import Manager
-from .stream import Stream
 
-__all__ = ('Table', 'Manager', 'Stream', 'rules')
+__all__ = ('Manager', )
