@@ -31,13 +31,13 @@ class Stream(list):
         """Return student in self."""
         return any(student in group for group in self)
 
-    def get_students(self):
-        """Get set of all students."""
+    def get_assigned(self):
+        """Get set of all assigned students."""
         result = set()
         for group in self:
             result |= group
         return result
 
-    def get_student_count(self):
+    def get_assigned_count(self):
         """Return count of assigned students."""
-        return sum(len(group) for group in self)
+        return len(self.get_assigned())

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for grmaster.Stream."""
+"""Tests for `grmaster.Stream`."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -18,7 +18,7 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster import Stream
+from grmaster.stream import Stream
 
 
 class TestStream:
@@ -28,6 +28,7 @@ class TestStream:
     stream = None
 
     def setup(self):
+        """Just init."""
         self.stream = Stream(set() for i in range(3))
         self.stream[0] |= {1, 2, 3}
         self.stream[1] |= {4, 5, 6}
@@ -37,13 +38,20 @@ class TestStream:
         stream_repr = repr(self.stream)
         assert stream_repr == 'Stream([{1, 2, 3}, {4, 5, 6}, set()])'
 
-    def test_stream_get_students(self):
-        assert self.stream.get_students() == {1, 2, 3, 4, 5, 6}
+    def test_stream_get_assigned(self):
+        """Result is set."""
+        assert self.stream.get_assigned() == {1, 2, 3, 4, 5, 6}
+        self.stream[2] |= {4, 5, 7}
+        assert self.stream.get_assigned() == {1, 2, 3, 4, 5, 6, 7}
 
-    def test_stream_get_student_count(self):
-        assert self.stream.get_student_count() == 6
+    def test_stream_get_assigned_count(self):
+        """Result is size of set."""
+        assert self.stream.get_assigned_count() == 6
+        self.stream[2] |= {4, 5, 7}
+        assert self.stream.get_assigned_count() == 7
 
     def test_stream_contains(self):
+        """`a in stream` test."""
         assert 1 in self.stream
         assert 2 in self.stream
         assert 3 in self.stream

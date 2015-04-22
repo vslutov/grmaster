@@ -48,15 +48,17 @@ class Manager:
         else:
             raise TypeError('Streams have already set up')
 
-    def get_student_count(self):
-        """Return count of assigned students"""
-        return sum(stream.get_student_count() for stream in self.streams)
+    def get_assigned(self):
+        """Get set of all assigned students."""
+        result = set()
+        for stream in self.streams:
+            result |= stream.get_assigned()
+        return result
+
+    def get_assigned_count(self):
+        """Return count of assigned students."""
+        return len(self.get_assigned())
 
     def is_assigned(self, student):
         """Return True, if student is assigned to some stream."""
         return any(student in stream for stream in self.streams)
-
-    # TODO: move to another file
-    def english_rule(self, english_header):
-        """Split students by english knowledge."""
-        aggregates = self.students.split_by_header(english_header)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for grmaster.Manager."""
+"""Tests for `grmaster.Manager`."""
 
 #   group-master - tool for divide students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -19,10 +19,11 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pytest import raises
-from grmaster import Manager
 from grmaster import data
+from grmaster.manager import Manager
 
 STUDENTS_TABLE = data.load('students.csv')
+STREAMS_INFO = data.get_streams_info('students.csv')
 
 def test_manager_init(tmpdir):
     """Test if manager creates normally."""
@@ -36,6 +37,18 @@ def test_manager_init(tmpdir):
     assert isinstance(manager, Manager)
     assert manager.students == STUDENTS_TABLE
 
+def test_manager_setup_streams():
+    """Method setup_streams may be called only once."""
+    manager = Manager(STUDENTS_TABLE)
+    manager.setup_streams(STREAMS_INFO)
+    assert len(manager.streams[0]) == 6
+    assert len(manager.streams[1]) == 6
+    assert len(manager.streams[2]) == 6
+    stream_list = [list(stream) for stream in manager.streams]
+    assert stream_list == [[set()] * 6] * 3
+    with raises(TypeError):
+        manager.setup_streams((6, 6, 7))
+
 
 class TestManager:
 
@@ -46,30 +59,27 @@ class TestManager:
     def setup(self):
         """Just setup manager."""
         self.manager = Manager(STUDENTS_TABLE)
-
-    def test_manager_setup_streams(self):
-        """Method setup_streams may be called only once."""
-        self.manager.setup_streams((6, 6, 6))
-        assert len(self.manager.streams[0]) == 6
-        assert len(self.manager.streams[1]) == 6
-        assert len(self.manager.streams[2]) == 6
-        stream_list = [list(stream) for stream in self.manager.streams]
-        assert stream_list == [[set()] * 6] * 3
-        with raises(TypeError):
-            self.manager.setup_streams((6, 6, 7))
+        self.manager.setup_streams(STREAMS_INFO)
+        self.manager.streams[1][3] |= {1, 2, 3}
 
     def test_manager_is_assigned(self):
         """Constant method."""
-        self.manager.setup_streams((6, 6, 6))
-        self.manager.streams[1][3] |= {1, 2, 3}
         assert self.manager.is_assigned(1)
         assert self.manager.is_assigned(2)
         assert self.manager.is_assigned(3)
         assert not self.manager.is_assigned(4)
         assert not self.manager.is_assigned(5)
 
-    def test_manager_get_student_count(self):
-        """Constant method."""
-        self.manager.setup_streams((6, 6, 6))
-        self.manager.streams[1][3] |= {1, 2, 3}
-        assert self.manager.get_student_count() == 3
+    def test_manager_get_assigned(self):
+        """Return set."""
+        assert isinstance(self.manager.get_assigned(), set)
+        assert self.manager.get_assigned() == {1, 2, 3}
+        self.manager.streams[1][4] |= {1, 2, 4}
+        assert self.manager.get_assigned() == {1, 2, 3, 4}
+
+    def test_manager_get_assigned_count(self):
+        """Return size of set."""
+        assert isinstance(self.manager.get_assigned_count(), int)
+        assert self.manager.get_assigned_count() == 3
+        self.manager.streams[1][4] |= {1, 2, 4}
+        assert self.manager.get_assigned_count() == 4

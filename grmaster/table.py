@@ -108,10 +108,10 @@ class Table:
     def split_by_column(self, index):
         """Return a tuple of tables."""
         cases = set(row[index] for row in self)
-        result = tuple()
+        result = []
         for case in cases:
             rows = tuple(row for row in self if row[index] == case)
-            result = result + (Table((self.header,) + rows),)
+            result.append(Table((self.header,) + rows))
 
         return result
 

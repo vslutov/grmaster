@@ -22,4 +22,4 @@ from .table import Table
 from .manager import Manager
 from .stream import Stream
 
-__all__ = ('Table', 'Manager', 'Stream')
+__all__ = ('Table', 'Manager', 'Stream', 'rules')
