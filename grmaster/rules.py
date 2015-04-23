@@ -33,10 +33,10 @@ def divide(elems, groups):
     begins = [sum(sizes[:i]) for i in range(groups)]
     return [set(elems[begins[i]:begins[i]+sizes[i]]) for i in range(groups)]
 
-def english_rule(manager, english_header, per_group=2):
+def english_rule(manager):
     """Forming groups with fixed english level."""
-    if manager.streams == []:
-        raise TypeError('You must specify stream info first.')
+    english_header = manager.config['english_header'][0]
+    per_group = int(manager.config['english_per_group'][0])
 
     english_levels = manager.students.split_by_header(english_header)
     english_levels.sort(key=len)

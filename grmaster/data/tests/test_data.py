@@ -18,19 +18,10 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os.path import join, basename
-
 from grmaster import data
-from grmaster.table import Table
-from glob import iglob
+import io
 
-def test_load():
+def test_openfile():
     """Test if wrong data folder."""
-    table = data.load('students.csv')
-    assert isinstance(table, Table)
-    assert len(table) > 0
-
-def test_streams_info():
-    """Test that every file have streams_info."""
-    for filename in iglob(join(data.DATA_DIR, '*.csv')):
-        assert data.get_streams_info(basename(filename)) is not None
+    table = data.openfile('students.csv')
+    assert isinstance(table, io.IOBase)

@@ -19,20 +19,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from grmaster.table import Table
 
 DATA_DIR = os.path.abspath(os.path.dirname(__file__))
 
-def load(filename):
-    """Load file from test data dir by name."""
-    return Table.from_csv_file(os.path.join(DATA_DIR, filename))
-
-def get_streams_info(filename):
-    """
-    Every file in library have connected info.
-
-    Available files:
-    - students.csv
-    """
-    if filename == 'students.csv':
-        return (6, 6, 6)
+def openfile(filename):
+    """Open file from test data dir by name."""
+    return open(os.path.join(DATA_DIR, filename), 'r')

@@ -20,6 +20,7 @@
 
 from .table import Table
 from .stream import Stream
+import csv
 
 
 class Manager:
@@ -27,26 +28,37 @@ class Manager:
     """
     Manager is a list of streams.
 
-    Manager() can be invoked with filename or Table argument.
+    Manager(csvfile).
     """
 
     streams = []
+    config = {}
 
-    def __init__(self, student_table):
+    def __init__(self, students_file):
         """Initialize self.  See help(type(self)) for accurate signature."""
-        if isinstance(student_table, Table):
-            self.students = student_table
-        else:
-            self.students = Table.from_csv_file(student_table)
+        reader = csv.reader(students_file)
 
-    def setup_streams(self, streams_info):
-        """Set up stream size info."""
-        if self.streams == []:
-            self.streams = []
-            for stream_info in streams_info:
-                self.streams.append(Stream(set() for i in range(stream_info)))
-        else:
-            raise TypeError('Streams have already set up')
+        finish_setup = False
+        while not finish_setup:
+            line = next(reader)
+            size = len(line)
+            if line == ['',] * size:
+                finish_setup = True
+            else:
+                while line[-1] == '':
+                    line = line[:-1]
+                name = line[0].split('#')[0].strip()
+                content = line[1:]
+
+                self.config[name] = content
+
+        streams_info = [int(x) for x in self.config['streams_info']]
+
+        self.streams = []
+        for stream_info in streams_info:
+            self.streams.append(Stream(set() for i in range(stream_info)))
+
+        self.students = Table(reader)
 
     def get_assigned(self):
         """Get set of all assigned students."""

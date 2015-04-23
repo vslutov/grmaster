@@ -24,8 +24,7 @@ from grmaster.manager import Manager
 from grmaster.rules import divide
 from grmaster.rules import english_rule
 
-STUDENTS_TABLE = data.load('students.csv')
-STREAMS_INFO = data.get_streams_info('students.csv')
+STUDENTS_FILE = data.openfile('students.csv')
 
 def test_divide():
     """Test internal function divide."""
@@ -51,14 +50,12 @@ class TestRules:
 
     def setup(self):
         """Init data from test set."""
-        self.manager = Manager(STUDENTS_TABLE)
+        STUDENTS_FILE.seek(0)
+        self.manager = Manager(STUDENTS_FILE)
 
     def test_rules_english_rule(self):
         """Test case for `english_rule`."""
-        with raises(TypeError):
-            english_rule(self.manager, 'Английский')
-        self.manager.setup_streams(STREAMS_INFO)
-        english_rule(self.manager, 'Английский')
+        english_rule(self.manager)
         assert self.manager.get_assigned_count() == len(self.manager.students)
 
         english_index = self.manager.students.header.index('Английский')

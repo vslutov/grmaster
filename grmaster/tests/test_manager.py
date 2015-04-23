@@ -18,36 +18,17 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pytest import raises
 from grmaster import data
 from grmaster.manager import Manager
 
-STUDENTS_TABLE = data.load('students.csv')
-STREAMS_INFO = data.get_streams_info('students.csv')
+STUDENTS_FILE = data.openfile('students.csv')
 
-def test_manager_init(tmpdir):
+def test_manager_init():
     """Test if manager creates normally."""
-    manager = Manager(STUDENTS_TABLE)
+    STUDENTS_FILE.seek(0)
+    manager = Manager(STUDENTS_FILE)
     assert isinstance(manager, Manager)
-    assert manager.students == STUDENTS_TABLE
-
-    table_file = tmpdir.join('table.csv')
-    table_file.write(STUDENTS_TABLE.to_csv())
-    manager = Manager(str(table_file))
-    assert isinstance(manager, Manager)
-    assert manager.students == STUDENTS_TABLE
-
-def test_manager_setup_streams():
-    """Method setup_streams may be called only once."""
-    manager = Manager(STUDENTS_TABLE)
-    manager.setup_streams(STREAMS_INFO)
-    assert len(manager.streams[0]) == 6
-    assert len(manager.streams[1]) == 6
-    assert len(manager.streams[2]) == 6
-    stream_list = [list(stream) for stream in manager.streams]
-    assert stream_list == [[set()] * 6] * 3
-    with raises(TypeError):
-        manager.setup_streams((6, 6, 7))
+    assert [len(stream) for stream in manager.streams] == [6, 6, 6]
 
 
 class TestManager:
@@ -58,8 +39,8 @@ class TestManager:
 
     def setup(self):
         """Just setup manager."""
-        self.manager = Manager(STUDENTS_TABLE)
-        self.manager.setup_streams(STREAMS_INFO)
+        STUDENTS_FILE.seek(0)
+        self.manager = Manager(STUDENTS_FILE)
         self.manager.streams[1][3] |= {1, 2, 3}
 
     def test_manager_is_assigned(self):
