@@ -62,8 +62,12 @@ class Table:
     def __init__(self, table):
         """Initialize self.  See help(type(self)) for accurate signature."""
         table = tuple(tuple(row) for row in table)
-        self.body = table[1:]
         self.header = table[0]
+        while self.header[-1] == '':
+            self.header = self.header[:-1]
+        width = len(self.header)
+
+        self.body = tuple(row[:width] for row in table[1:])
 
     def __str__(self):
         """Return str(self)."""

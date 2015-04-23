@@ -20,6 +20,7 @@
 
 from itertools import product
 import random
+from .table import Table
 
 
 def divide(elems, groups):
@@ -48,8 +49,9 @@ def english_rule(manager):
         streams += stream
     random.shuffle(streams)
 
+    students = [list(student) for student in manager.students]
     avail_groups = len(streams)
-    students_per_group = len(manager.students) / avail_groups
+    students_per_group = len(students) / avail_groups
 
     for i in range(len(english_levels)):
         level = english_levels[i]
@@ -60,4 +62,14 @@ def english_rule(manager):
 
         for eng_group in divide(level, groups_on_level):
             study_group = streams.pop()
+            str_group = str(101 +
+                            study_group[0] * int(manager.config['streams_info'][0])
+                            + study_group[1])
             manager.streams[study_group[0]][study_group[1]] |= eng_group
+
+            # TODO: Dirty hack, remove
+            for student in eng_group:
+                students[students.index(list(student))].append(str_group)
+
+    manager.students = Table((manager.students.header + ('Group',),) +
+                             tuple(students))
