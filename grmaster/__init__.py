@@ -2,7 +2,7 @@
 
 """Tool for nice dividing students into groups."""
 
-#   group-master - tool for divide students into groups
+#   group-master - tool for dividing students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
 #
 #   This program is free software: you can redistribute it and/or modify
