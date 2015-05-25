@@ -20,7 +20,8 @@
 
 from itertools import product
 import random
-from .table import Table
+
+from grmaster.table import Table
 
 
 def divide(elems, groups):

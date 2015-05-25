@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Standard test tables and other usefull stuff."""
+"""Http interface for group-master."""
 
 #   group-master - tool for dividing students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -18,20 +18,27 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+from grmaster import data
+from flask import Flask, request, Response
 
-DATA_DIR = os.path.abspath(os.path.dirname(__file__))
+APP = Flask(__name__)
+INDEX_HTML = ''.join(data.readlines('index.html'))
+TEMPLATE_CSV = ''.join(data.readlines('template.csv'))
 
-def openfile(filename, mode='r'):
-    """Open file from test data dir by name."""
-    return open(os.path.join(DATA_DIR, filename), mode)
+@APP.route('/')
+def index():
+    return INDEX_HTML
 
-def readbytes(filename):
-    """Read bytes from test data file."""
-    with openfile(filename, 'rb') as file:
-        return file.read()
+@APP.route('/template.csv')
+def template():
+    return Response(TEMPLATE_CSV, mimetype='text/csv')
 
-def readlines(filename):
-    """Simple readlines method."""
-    with openfile(filename) as file:
-        return file.readlines()
+@APP.route('/result.csv', methods=['POST'])
+def result():
+    print(request)
+    return Response(TEMPLATE_CSV, mimetype='text/csv')
+
+def run(port=8000, app=APP):
+    """Run httpserver on selected port."""
+
+    app.run(port=port)

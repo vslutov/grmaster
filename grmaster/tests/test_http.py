@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Standard test tables and other usefull stuff."""
+"""Tests for `grmaster.http`."""
 
 #   group-master - tool for dividing students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
@@ -18,20 +18,22 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+from grmaster import http, data
+import pytest
 
-DATA_DIR = os.path.abspath(os.path.dirname(__file__))
+@pytest.fixture
+def app():
+    """Fixture for easy testing."""
+    return http.APP.test_client()
 
-def openfile(filename, mode='r'):
-    """Open file from test data dir by name."""
-    return open(os.path.join(DATA_DIR, filename), mode)
+def test_index(app):
+    """Index must return static index html."""
+    assert data.readbytes('index.html') == app.get('/').data
 
-def readbytes(filename):
-    """Read bytes from test data file."""
-    with openfile(filename, 'rb') as file:
-        return file.read()
+def test_template(app):
+    """Template must return static template csv."""
+    assert data.readbytes('template.csv') == app.get('/template.csv').data
 
-def readlines(filename):
-    """Simple readlines method."""
-    with openfile(filename) as file:
-        return file.readlines()
+def test_result(app):
+    """Result must return anything."""
+    assert len(app.post('/result.csv').data) > 0

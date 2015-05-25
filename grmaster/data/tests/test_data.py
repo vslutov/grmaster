@@ -23,5 +23,20 @@ import io
 
 def test_openfile():
     """Test if wrong data folder."""
-    table = data.openfile('students.csv')
-    assert isinstance(table, io.IOBase)
+    with data.openfile('students.csv') as table:
+        assert isinstance(table, io.IOBase)
+
+def test_readbytes():
+    """Test readbytes function (by readlines method."""
+    first = bytes(''.join(data.readlines('students.csv')), 'utf-8')
+
+    second = data.readbytes('students.csv')
+
+    assert first == second
+
+def test_readlines():
+    """Just test."""
+    with data.openfile('students.csv') as table:
+        first = table.readlines()
+    second = data.readlines('students.csv')
+    assert first == second
