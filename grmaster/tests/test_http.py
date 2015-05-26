@@ -36,4 +36,9 @@ def test_template(app):
 
 def test_result(app):
     """Result must return anything."""
-    assert len(app.post('/result.csv').data) > 0
+    assert app.post('/result.csv').status_code == 400
+    with data.openfile('students.csv', 'rb') as studentfile:
+        response = app.post('/result.csv',
+                            data=dict(studentfile=(studentfile, 'students.csv')))
+        assert response.status_code == 200
+        assert response.mimetype == 'text/csv'

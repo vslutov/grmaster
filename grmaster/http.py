@@ -18,8 +18,9 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster import data
-from flask import Flask, request, Response
+from grmaster import data, rules, Manager
+from flask import Flask, request, Response, abort
+import tempfile
 
 APP = Flask(__name__)
 INDEX_HTML = ''.join(data.readlines('index.html'))
@@ -35,8 +36,17 @@ def template():
 
 @APP.route('/result.csv', methods=['POST'])
 def result():
-    print(request)
-    return Response(TEMPLATE_CSV, mimetype='text/csv')
+    if 'studentfile' not in request.files:
+        abort(400)
+
+    with tempfile.TemporaryFile('w+') as temp_file:
+        temp_file.write(str(request.files['studentfile'].read(),
+                            encoding='utf-8'))
+        temp_file.seek(0)
+        manager = Manager(temp_file)
+
+    rules.english_rule(manager)
+    return Response(manager.students.to_csv(), mimetype='text/csv')
 
 def run(port=8000, app=APP):
     """Run httpserver on selected port."""
