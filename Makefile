@@ -1,4 +1,11 @@
 SRC_DIR = grmaster
+GENERATED = build dist *.egg-info
+
+clean :
+	rm -rf $(GENERATED)
+
+dist :
+	python setup.py sdist bdist_egg bdist_wheel
 
 test :
 	py.test $(SRC_DIR)

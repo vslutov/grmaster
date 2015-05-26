@@ -48,7 +48,7 @@ def get_stdoutlines(tmpdir, *args):
 
 def test_usage(tmpdir):
     """Must print usage."""
-    result = get_stdoutlines(tmpdir, '--usage')
+    result = get_stdoutlines(tmpdir, 'usage')
     assert 'Usage' in result[0]
     assert 'grmaster' in result[0]
     assert len(result) > 1
@@ -61,13 +61,13 @@ def test_wrong_format(tmpdir):
 
 def test_license(tmpdir):
     """Must print license."""
-    result = get_stdoutlines(tmpdir, '--license')
+    result = get_stdoutlines(tmpdir, 'license')
     license_txt = data.readlines('LICENSE.txt')
     assert result == license_txt
 
 def test_template(tmpdir):
     """Main must print template."""
-    result = get_stdoutlines(tmpdir, '--template')
+    result = get_stdoutlines(tmpdir, 'template')
     template_csv = data.readlines('template.csv')
     assert result == template_csv
 
@@ -76,11 +76,11 @@ def test_divide(tmpdir):
     students_file = tmpdir.join('students.csv')
     with open(str(students_file), 'w') as students:
         students.writelines(data.readlines('students.csv'))
-    result = get_stdoutlines(tmpdir, '--divide', str(students_file))
+    result = get_stdoutlines(tmpdir, 'divide', str(students_file))
     assert result[0].strip('\n').split(',')[-1] == "Group"
     assert len(result) > 10
 
 def test_http(tmpdir):
     """Fake http module rase NotImplementedError."""
     with raises(NotImplementedError):
-        get_stdoutlines(tmpdir, '--server')
+        get_stdoutlines(tmpdir, 'server')

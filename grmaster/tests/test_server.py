@@ -18,13 +18,13 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster import http, data
+from grmaster import server, data
 import pytest
 
 @pytest.fixture
 def app():
     """Fixture for easy testing."""
-    return http.APP.test_client()
+    return server.APP.test_client()
 
 def test_index(app):
     """Index must return static index html."""
