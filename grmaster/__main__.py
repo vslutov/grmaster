@@ -24,7 +24,7 @@ Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from grmaster import Manager, data, rules, server
-import sys, os, subprocess, pytest
+import sys, os, pytest
 
 USAGE = """Usage: {0} COMMAND
 
@@ -45,7 +45,7 @@ def printfile(filename, file):
     file.writelines(txt)
 
 
-def main(argv=sys.argv, file=sys.stdout, grmaster_http_app=server.APP):
+def main(argv=tuple(sys.argv), file=sys.stdout, grmaster_http_app=server.APP):
     """Print usage and exec simple commands."""
     if len(argv) == 2 and argv[1] == 'license':
         printfile('LICENSE.txt', file=file)

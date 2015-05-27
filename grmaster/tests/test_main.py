@@ -23,7 +23,9 @@ from grmaster import data
 from pytest import raises
 
 class FakeGrmasterHttpAPP:
+    """Do nothing."""
     def run(self, port=None):
+        """We can except it."""
         raise NotImplementedError()
 
 def test_printfile(tmpdir):

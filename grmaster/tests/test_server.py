@@ -18,7 +18,7 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster import server, data
+from grmaster import server, data, setting
 import pytest
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def app():
 
 def test_index(app):
     """Index must return static index html."""
-    assert data.readbytes('index.html') == app.get('/').data
+    assert data.readbytes('index.' + setting.LANG + '.html') == app.get('/').data
 
 def test_template(app):
     """Template must return static template csv."""

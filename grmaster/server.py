@@ -18,24 +18,27 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster import data, rules, Manager
+from grmaster import data, rules, Manager, setting
 from flask import Flask, request, Response, abort
 import tempfile
 
 APP = Flask(__name__)
-INDEX_HTML = ''.join(data.readlines('index.html'))
-TEMPLATE_CSV = ''.join(data.readlines('template.csv'))
+INDEX_HTML = data.readbytes('index.' + setting.LANG + '.html')
+TEMPLATE_CSV = data.readbytes('template.csv')
 
 @APP.route('/')
 def index():
+    """Language-specific function."""
     return INDEX_HTML
 
 @APP.route('/template.csv')
 def template():
+    """One request, one template."""
     return Response(TEMPLATE_CSV, mimetype='text/csv')
 
 @APP.route('/result.csv', methods=['POST'])
 def result():
+    """Calc and return."""
     if 'studentfile' not in request.files:
         abort(400)
 
@@ -50,5 +53,4 @@ def result():
 
 def run(port=8000, app=APP):
     """Run httpserver on selected port."""
-
     app.run(port=port)
