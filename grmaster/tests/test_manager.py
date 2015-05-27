@@ -2,7 +2,7 @@
 
 """Tests for `grmaster.Manager`."""
 
-#   group-master - tool for dividing students into groups
+#   grmaster - tool for dividing students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
 #
 #   This program is free software: you can redistribute it and/or modify

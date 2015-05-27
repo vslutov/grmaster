@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-group-master - tool for dividing students into groups.
+grmaster - tool for dividing students into groups.
 
 Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
 """
 
-#   group-master - tool for dividing students into groups
+#   grmaster - tool for dividing students into groups
 #   Copyright (C) 2015  Lutov V. S. <vslutov@yandex.ru>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import sys, os, pytest
 
 USAGE = """Usage: {0} COMMAND
 
-Please, read the doc: <https://vslutov.github.io/group-master/>
+Please, read the doc: <https://vslutov.github.io/grmaster/>
 
 Available commands:
   divide file     Run dividing process
