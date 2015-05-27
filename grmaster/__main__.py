@@ -34,7 +34,7 @@ Available commands:
   divide file     Run dividing process
   help            Show this help and exit
   license         Show license and exit
-  server          Run http server at 8000 port
+  server          Run http server (see setting.py)
   template        Print csv template on stdout
   test            Run internal tests"""
 
@@ -58,7 +58,7 @@ def main(argv=tuple(sys.argv), file=sys.stdout, grmaster_http_app=server.APP):
         rules.english_rule(manager)
         print(manager.students.to_csv(), file=file)
     elif len(argv) == 2 and argv[1] == 'server':
-        server.run(port=8000, app=grmaster_http_app)
+        server.run(app=grmaster_http_app)
     elif len(argv) == 2 and argv[1] == 'test':
         path = os.path.abspath(os.path.dirname(__file__))
         sys.argv[1] = path

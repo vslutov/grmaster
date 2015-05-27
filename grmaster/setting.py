@@ -19,3 +19,4 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 LANG = 'ru' # For server, available languages: ru, en
+PORT = 8000 # For server

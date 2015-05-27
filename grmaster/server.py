@@ -51,6 +51,6 @@ def result():
     rules.english_rule(manager)
     return Response(manager.students.to_csv(), mimetype='text/csv')
 
-def run(port=8000, app=APP):
-    """Run httpserver on selected port."""
-    app.run(port=port)
+def run(app=APP):
+    """Run app."""
+    app.run(port=setting.PORT)
