@@ -22,55 +22,84 @@ from itertools import product
 import random
 
 from grmaster.table import Table
+from sys import exit
 
-
-def divide(elems, groups):
+def divide(elem_count, group_count):
     """Random divide elems into groups."""
-    elems = list(elems)
-    random.shuffle(elems)
+    sizes = [len(elem_count) // group_count] * group_count
+    prefix = len(elem_count) % group_count
+    sizes[:prefix] = [len(elem_count) // group_count + 1] * prefix
+    return sizes
 
-    sizes = [len(elems) // groups] * groups
-    prefix = len(elems) % groups
-    sizes[:prefix] = [len(elems) // groups + 1] * prefix
-    begins = [sum(sizes[:i]) for i in range(groups)]
-    return [set(elems[begins[i]:begins[i]+sizes[i]]) for i in range(groups)]
+def set_item(container, indeces, value):
+    """Set item in recursive list."""
+    while len(indeces) > 1:
+        container = container[indeces[0]]
+        indeces = indeces[1:]
+    container[indeces[0]] = value
 
-def english_rule(manager):
-    """Forming groups with fixed english level."""
-    english_header = manager.config['english_header'][0]
+def get_item(container, indeces):
+    """Get item from recursive list."""
+    while len(indeces) > 1:
+        container = container[indeces[0]]
+        indeces = indeces[1:]
+    return container[indeces[0]]
+
+def init_meta_english_groups(manager):
+    """Init meta for english rule."""
+    header = manager.config['english_header'][0]
+    index = manager.students.header.index(header)
+    manager.meta['_english_index'] = index
     per_group = int(manager.config['english_per_group'][0])
 
-    english_levels = manager.students.split_by_header(english_header)
-    english_levels.sort(key=len)
+    levels = manager.students.split_by_header(header)
+    levels.sort(key=len)
 
-    streams = []
-    for i in range(len(manager.streams)):
-        stream = manager.streams[i]
-        stream = list(product((i,), range(len(stream)), range(per_group)))
-        streams += stream
-    random.shuffle(streams)
+    manager.meta['_english_groups'] = [[[''] * per_group
+                                        for i in range(stream_size)]
+                                       for stream_size in manager.stream_sizes]
+    meta_english_groups = manager.meta['_english_groups']
 
-    students = [list(student) for student in manager.students]
-    avail_groups = len(streams)
-    students_per_group = len(students) / avail_groups
+    groups = [[(stream, group, half)
+               for group in range(manager.stream_sizes[stream])
+               for half in range(per_group)]
+              for stream in range(len(manager.stream_sizes))]
+    for stream in groups:
+        random.shuffle(stream)
 
-    for i in range(len(english_levels)):
-        level = english_levels[i]
-        groups_on_level = round(len(level) / students_per_group)
-        if i == len(english_levels) - 1:
-            groups_on_level = avail_groups
-        avail_groups -= groups_on_level
+    group_count = sum(len(stream) for stream in groups)
+    group_size = len(manager.students) // group_count
 
-        for eng_group in divide(level, groups_on_level):
-            study_group = streams.pop()
-            str_group = str(101 +
-                            study_group[0] * int(manager.config['streams_info'][0])
-                            + study_group[1])
-            manager.streams[study_group[0]][study_group[1]] |= eng_group
+    # Every english level must have a group on each stream
+    for level in levels:
+        level_group_count = len(level) // group_size
 
-            # TODO: Dirty hack, remove
-            for student in eng_group:
-                students[students.index(list(student))].append(str_group)
+        for stream in groups:
+            if level_group_count <= 0:
+                break
+            else:
+                group = stream[0]
+                stream.remove(group)
+                set_item(meta_english_groups, group, level[0][index])
+                level_group_count -= 1
 
-    manager.students = Table((manager.students.header + ('Group',),) +
-                             tuple(students))
+    groups = [group for stream in groups for group in stream]
+    random.shuffle(groups)
+
+    for level in levels:
+        level_group_count = len(level) // group_size - len(manager.stream_sizes)
+
+        if level_group_count > 0:
+            for group in groups[:level_group_count]:
+                groups.remove(group)
+                set_item(meta_english_groups, group, level[0][index])
+
+def english_rule(manager, student, group):
+    """Test if student can study in group."""
+    index = manager.meta['_english_index']
+    return student[index] in get_item(manager.meta['_english_index'], group)
+
+def add_english_rule(manager):
+    """Add english rule for futher using."""
+    init_meta_english_groups(manager)
+    manager.rule_chain.append(english_rule)

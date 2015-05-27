@@ -33,6 +33,8 @@ class Manager:
 
     streams = []
     config = {}
+    meta = {}
+    rule_chain = []
 
     def __init__(self, students_file):
         """Initialize self.  See help(type(self)) for accurate signature."""
@@ -51,20 +53,23 @@ class Manager:
 
                 self.config[name] = content
 
-        streams_info = [int(x) for x in self.config['streams_info']]
+        self.stream_sizes = [int(x) for x in self.config['streams_info']]
 
         self.streams = []
-        for stream_info in streams_info:
+        for stream_info in self.stream_sizes:
             self.streams.append(Stream(set() for i in range(stream_info)))
 
         self.students = Table(reader)
 
-        self.additional_tables = {}
         name = next_or_empty(reader)
         while not is_empty(name):
             table = Table(reader)
-            self.additional_tables[name[0]] = table
+            self.meta[name[0]] = table
             name = next_or_empty(reader)
+
+    def can_study(self, student, group):
+        """Functional part is in rule module. Just call it."""
+        return all(rule(self, student, group) for rule in self.rule_chain)
 
     def get_assigned(self):
         """Get set of all assigned students."""
