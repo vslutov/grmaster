@@ -18,7 +18,7 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from grmaster.table import Table
+from grmaster.table import Table, is_empty, next_or_empty
 from grmaster.stream import Stream
 import csv
 
@@ -41,8 +41,7 @@ class Manager:
         finish_setup = False
         while not finish_setup:
             line = next(reader)
-            size = len(line)
-            if line == ['',] * size:
+            if is_empty(line):
                 finish_setup = True
             else:
                 while line[-1] == '':
@@ -59,6 +58,13 @@ class Manager:
             self.streams.append(Stream(set() for i in range(stream_info)))
 
         self.students = Table(reader)
+
+        self.additional_tables = {}
+        name = next_or_empty(reader)
+        while not is_empty(name):
+            table = Table(reader)
+            self.additional_tables[name[0]] = table
+            name = next_or_empty(reader)
 
     def get_assigned(self):
         """Get set of all assigned students."""

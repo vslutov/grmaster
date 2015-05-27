@@ -45,6 +45,13 @@ def is_empty(line):
     """Empty csv line."""
     return [''] * len(line) == list(line)
 
+def next_or_empty(reader):
+    """Return empty array if reader has ended."""
+    try:
+        return next(reader)
+    except StopIteration:
+        return []
+
 class Table:
 
     """
@@ -62,9 +69,15 @@ class Table:
     from_csv_str = _from_csv_str
     from_csv_file = _from_csv_file
 
-    def __init__(self, table):
+    def __init__(self, input_table):
         """Initialize self.  See help(type(self)) for accurate signature."""
-        table = tuple(tuple(row) for row in table)
+        table = []
+        for row in input_table:
+            if is_empty(row):
+                break
+            else:
+                table.append(tuple(row))
+
         self.header = table[0]
         while self.header[-1] == '':
             self.header = self.header[:-1]

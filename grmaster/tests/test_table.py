@@ -20,6 +20,7 @@
 
 from pytest import raises
 from grmaster.table import Table, is_empty
+import itertools
 
 TABLE_TUPLE = (('Name', 'Surname', 'City'),
                ('Alex', 'Brown', 'Moscow'),
@@ -47,6 +48,18 @@ def test_table_new():
     assert table.header == TABLE_TUPLE[0]
     assert tuple(table) == TABLE_TUPLE[1:]
 
+def test_table_new_two_tables():
+    """Table is a tuple, so test `new`, not `init`."""
+    two_tables = itertools.chain(TABLE_TUPLE,
+                                 (('',) * len(TABLE_TUPLE[0]), ),
+                                 TABLE_TUPLE[:-1])
+    table_one = Table(two_tables)
+    assert table_one.header == TABLE_TUPLE[0]
+    assert tuple(table_one) == TABLE_TUPLE[1:]
+    table_two = Table(two_tables)
+    assert table_two.header == TABLE_TUPLE[0]
+    assert tuple(table_two) == TABLE_TUPLE[1:-1]
+
 
 def test_is_empty():
     """Input is a list."""
@@ -71,7 +84,6 @@ def test_table_from_csv_file(tmpdir):
     table = Table.from_csv_file(str(table_file))
     assert table.header == TABLE_TUPLE[0]
     assert tuple(table) == TABLE_TUPLE[1:]
-
 
 def test_from_csv_str():
     """Loading from string."""
