@@ -41,6 +41,9 @@ def _from_csv_file(input_file):
         input_file.close()
     return table
 
+def is_empty(line):
+    """Empty csv line."""
+    return [''] * len(line) == list(line)
 
 class Table:
 

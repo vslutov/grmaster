@@ -52,9 +52,8 @@ def main(argv=tuple(sys.argv), file=sys.stdout, grmaster_http_app=server.APP):
     elif len(argv) == 2 and argv[1] == 'template':
         printfile('template.csv', file=file)
     elif len(argv) == 3 and argv[1] == 'divide':
-        input_file = open(argv[2], 'r')
-        manager = Manager(input_file)
-        input_file.close()
+        with open(argv[2], 'r') as input_file:
+            manager = Manager(input_file)
         rules.english_rule(manager)
         print(manager.students.to_csv(), file=file)
     elif len(argv) == 2 and argv[1] == 'server':

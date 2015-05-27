@@ -19,7 +19,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pytest import raises
-from grmaster.table import Table
+from grmaster.table import Table, is_empty
 
 TABLE_TUPLE = (('Name', 'Surname', 'City'),
                ('Alex', 'Brown', 'Moscow'),
@@ -46,6 +46,22 @@ def test_table_new():
     table = Table(TABLE_TUPLE)
     assert table.header == TABLE_TUPLE[0]
     assert tuple(table) == TABLE_TUPLE[1:]
+
+
+def test_is_empty():
+    """Input is a list."""
+    assert is_empty(tuple())
+    assert is_empty(('',))
+    assert is_empty(('', ''))
+    assert is_empty(('', '') * 10)
+    assert not is_empty(('aba', ''))
+    assert not is_empty(('', 'aba'))
+    assert is_empty([])
+    assert is_empty([''])
+    assert is_empty(['', ''])
+    assert is_empty(['', ''] * 10)
+    assert not is_empty(['aba', ''])
+    assert not is_empty(['', 'aba'])
 
 
 def test_table_from_csv_file(tmpdir):

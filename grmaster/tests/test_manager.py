@@ -30,7 +30,6 @@ def test_manager_init():
     assert isinstance(manager, Manager)
     assert [len(stream) for stream in manager.streams] == [6, 6, 6]
 
-
 class TestManager:
 
     """Tests for grmaster.Manager."""
