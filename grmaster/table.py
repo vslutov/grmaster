@@ -146,3 +146,9 @@ class Table:
             return ','.join(row)
         return (row_to_csv(self.header) + '\n' +
                 '\n'.join(row_to_csv(row) for row in self))
+
+    def get_by_column(self, column, value):
+        """Return first row in table with specific value."""
+        for row in self:
+            if row[column] == value:
+                return row

@@ -67,6 +67,21 @@ def init_meta_english_groups(manager):
 
         groups = groups[level_group_count:]
 
+def init_meta_wishes(manager):
+    """Meta wishes usefull with assignement."""
+    if 'stream_tables' in manager.config:
+        header = manager.config['stream_tables']
+        manager.meta['_wishes'] = [None for i in range(len(manager.students))]
+        for i in range(len(header)):
+            if header[i] == '':
+                break
+            else:
+                student_names = manager.meta[header[i]]
+                for student_name in student_names:
+                    student = manager.students.get_by_column(0, student_name[0])
+                    student_index = manager.students.body.index(student)
+                    manager.meta['_wishes'][student_index] = i
+
 def english_rule(manager, student, group):
     """Test if student can study in group."""
     index = manager.meta['_english_index']
@@ -86,7 +101,7 @@ def english_assign(manager, student, group):
     return False
 
 def add_english(manager):
-    """Add english rule for futher using."""
+    """Add english rule and add for futher using."""
     init_meta_english_groups(manager)
     manager.rule_chain.append(english_rule)
     manager.assign_chain.append(english_assign)
@@ -94,7 +109,33 @@ def add_english(manager):
 def assign_friends(manager):
     """First, assign friends."""
 
+def assign_wishes(manager):
+    """Just try to assign, who wish to be assigned."""
+    if '_wishes' in manager.meta:
+        meta_wishes = manager.meta['_wishes']
+        wishes = []
+        has_score = 'score' in manager.config
+        print(has_score)
+        if has_score:
+            score_index = manager.students.header.index(manager.config['score_header'][0])
+        for i in range(len(manager.students)):
+            if meta_wishes[i] is not None:
+                stream = meta_wishes[i]
+                student = manager.students[i]
+                score = int(student[score_index]) if has_score else 0
+                wishes.append([score, student, stream])
+
+        wishes.sort(reverse=True)
+
+        for score, student, stream in wishes:
+            for group in range(manager.stream_sizes[stream]):
+                if manager.assign_student(student, [stream, group]):
+                    break
+
 def apply_all(manager):
     """Apply all rules in right sequence"""
     add_english(manager)
+    init_meta_wishes(manager)
+    assign_friends(manager)
+    assign_wishes(manager)
     manager.assign_all()

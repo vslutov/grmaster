@@ -1,9 +1,9 @@
 stream_sizes,6,6,6
-stream_headers,1 поток,2 поток,3 поток
+stream_tables,1 поток,2 поток,3 поток
 english_header,Английский,,
 english_per_group,2,,
-score,Балл,,
-friends,Друзья,,
+score_header,Балл,,
+friends_table,Друзья,,
 ,,,
 ФИО,Английский,Балл,
 Нагибин Ефим Родионович,продолжающий,404,

@@ -23,25 +23,25 @@ from grmaster.manager import Manager, get_item, set_item
 
 def test_get_item():
     """Full test."""
-    a = [[1, 2], [3, 4]]
-    assert get_item(a, [0, 0]) == 1
-    assert get_item(a, [0, 1]) == 2
-    assert get_item(a, [1, 0]) == 3
-    assert get_item(a, [1, 1]) == 4
-    assert get_item(a, [0]) == [1, 2]
-    assert get_item(a, [1]) == [3, 4]
+    arr = [[1, 2], [3, 4]]
+    assert get_item(arr, [0, 0]) == 1
+    assert get_item(arr, [0, 1]) == 2
+    assert get_item(arr, [1, 0]) == 3
+    assert get_item(arr, [1, 1]) == 4
+    assert get_item(arr, [0]) == [1, 2]
+    assert get_item(arr, [1]) == [3, 4]
 
 def test_set_item():
     """Small test."""
-    a = [[1, 2], [3, 4]]
-    set_item(a, [0, 0], 5)
-    assert a == [[5, 2], [3, 4]]
-    set_item(a, [0, 1], 5)
-    assert a == [[5, 5], [3, 4]]
-    set_item(a, [1, 0], 5)
-    assert a == [[5, 5], [5, 4]]
-    set_item(a, [1, 1], 5)
-    assert a == [[5, 5], [5, 5]]
+    arr = [[1, 2], [3, 4]]
+    set_item(arr, [0, 0], 5)
+    assert arr == [[5, 2], [3, 4]]
+    set_item(arr, [0, 1], 5)
+    assert arr == [[5, 5], [3, 4]]
+    set_item(arr, [1, 0], 5)
+    assert arr == [[5, 5], [5, 4]]
+    set_item(arr, [1, 1], 5)
+    assert arr == [[5, 5], [5, 5]]
 
 class TestManager:
 
@@ -75,6 +75,7 @@ class TestManager:
         assert self.manager.is_assigned(self.student)
 
     def test_manager_assign_all(self):
+        """We can assign everyone."""
         self.manager.assign_all()
         for student in self.manager.students:
             assert self.manager.is_assigned(student)

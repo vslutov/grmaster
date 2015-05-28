@@ -55,7 +55,7 @@ class TestEnglishRule:
         assert not all(self.manager.can_study(student, group)
                        for group in self.manager.group_ids)
 
-    def test_english_rule_assign_student(self):
+    def test_english_assign_student(self):
         """We can add student in some group."""
         student = self.manager.students[0]
         for group in self.manager.group_ids:
@@ -64,7 +64,7 @@ class TestEnglishRule:
             else:
                 assert not self.manager.assign_student(student, group)
 
-    def test_english_rule_assign_everybody(self):
+    def test_english_assign_everybody(self):
         """We can add all students."""
         for student in self.manager.students:
             for group in self.manager.group_ids:

@@ -143,3 +143,9 @@ class TestTable:
     def test_table_to_csv(self):
         """Csv is a string."""
         assert self.table.to_csv() == TABLE_CSV
+
+    def test_table_get_by_column(self):
+        """Full test."""
+        for row in self.table:
+            for j in range(len(row) - 1):
+                assert self.table.get_by_column(j, row[j]) == row
