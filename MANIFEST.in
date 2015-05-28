@@ -1,3 +1,0 @@
-recursive-include grmaster/data *.html
-recursive-include grmaster/data *.txt
-recursive-include grmaster/data *.csv
