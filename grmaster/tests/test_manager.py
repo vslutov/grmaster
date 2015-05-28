@@ -21,45 +21,43 @@
 from grmaster import data
 from grmaster.manager import Manager
 
-STUDENTS_FILE = data.openfile('students.csv')
-
-def test_manager_init():
-    """Test if manager creates normally."""
-    STUDENTS_FILE.seek(0)
-    manager = Manager(STUDENTS_FILE)
-    assert isinstance(manager, Manager)
-    assert [len(stream) for stream in manager.streams] == [6, 6, 6]
-
 class TestManager:
 
     """Tests for grmaster.Manager."""
 
     manager = None
+    student = None
 
     def setup(self):
         """Just setup manager."""
-        STUDENTS_FILE.seek(0)
-        self.manager = Manager(STUDENTS_FILE)
-        self.manager.streams[1][3] |= {1, 2, 3}
+        with data.openfile('students.csv') as student_file:
+            self.manager = Manager(student_file)
+        assert isinstance(self.manager, Manager)
+        self.student = self.manager.students[0]
+
+    def test_manager_can_study(self):
+        """Everybody can study everywhere."""
+        assert all(self.manager.can_study(self.student, group)
+                   for group in self.manager.group_ids)
+
+    def test_manager_add_student(self):
+        """Constant method."""
+        self.manager.add_student(self.student, [0, 0])
+        assert self.manager.is_assigned(self.student)
+        assert self.manager.result_groups[0] == [0, 0]
 
     def test_manager_is_assigned(self):
-        """Constant method."""
-        assert self.manager.is_assigned(1)
-        assert self.manager.is_assigned(2)
-        assert self.manager.is_assigned(3)
-        assert not self.manager.is_assigned(4)
-        assert not self.manager.is_assigned(5)
+        """After assignation."""
+        assert not self.manager.is_assigned(self.student)
+        self.manager.add_student(self.student, [0, 0])
+        assert self.manager.is_assigned(self.student)
 
-    def test_manager_get_assigned(self):
-        """Return set."""
-        assert isinstance(self.manager.get_assigned(), set)
-        assert self.manager.get_assigned() == {1, 2, 3}
-        self.manager.streams[1][4] |= {1, 2, 4}
-        assert self.manager.get_assigned() == {1, 2, 3, 4}
-
-    def test_manager_get_assigned_count(self):
-        """Return size of set."""
-        assert isinstance(self.manager.get_assigned_count(), int)
-        assert self.manager.get_assigned_count() == 3
-        self.manager.streams[1][4] |= {1, 2, 4}
-        assert self.manager.get_assigned_count() == 4
+    def test_manager_add_everybody(self):
+        """We can assign everybody."""
+        for student in self.manager.students:
+            for group in self.manager.group_ids:
+                if self.manager.can_study(student, group):
+                    self.manager.add_student(student, group)
+                    break
+        for student in self.manager.students:
+            assert self.manager.is_assigned(student)

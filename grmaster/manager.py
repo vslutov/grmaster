@@ -19,8 +19,21 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from grmaster.table import Table, is_empty, next_or_empty
-from grmaster.stream import Stream
 import csv
+
+def set_item(container, indeces, value):
+    """Set item in recursive list."""
+    while len(indeces) > 1:
+        container = container[indeces[0]]
+        indeces = indeces[1:]
+    container[indeces[0]] = value
+
+def get_item(container, indeces):
+    """Get item from recursive list."""
+    while len(indeces) > 1:
+        container = container[indeces[0]]
+        indeces = indeces[1:]
+    return container[indeces[0]]
 
 
 class Manager:
@@ -31,13 +44,13 @@ class Manager:
     Manager(csvfile).
     """
 
-    streams = []
-    config = {}
-    meta = {}
-    rule_chain = []
-
     def __init__(self, students_file):
         """Initialize self.  See help(type(self)) for accurate signature."""
+        self.config = {}
+        self.meta = {}
+        self.rule_chain = []
+        self.add_chain = []
+
         reader = csv.reader(students_file)
 
         finish_setup = False
@@ -54,12 +67,12 @@ class Manager:
                 self.config[name] = content
 
         self.stream_sizes = [int(x) for x in self.config['streams_info']]
-
-        self.streams = []
-        for stream_info in self.stream_sizes:
-            self.streams.append(Stream(set() for i in range(stream_info)))
+        self.group_ids = [[stream, group]
+                          for stream in range(len(self.stream_sizes))
+                          for group in range(self.stream_sizes[stream])]
 
         self.students = Table(reader)
+        self.result_groups = [None for i in range(len(self.students))]
 
         name = next_or_empty(reader)
         while not is_empty(name):
@@ -71,17 +84,14 @@ class Manager:
         """Functional part is in rule module. Just call it."""
         return all(rule(self, student, group) for rule in self.rule_chain)
 
-    def get_assigned(self):
-        """Get set of all assigned students."""
-        result = set()
-        for stream in self.streams:
-            result |= stream.get_assigned()
-        return result
-
-    def get_assigned_count(self):
-        """Return count of assigned students."""
-        return len(self.get_assigned())
+    def add_student(self, student, group):
+        """Test and add."""
+        if self.can_study(student, group):
+            if all(add(self, student, group) for add in self.add_chain):
+                self.result_groups[self.students.body.index(student)] = group
+                return True
+        return False
 
     def is_assigned(self, student):
         """Return True, if student is assigned to some stream."""
-        return any(student in stream for stream in self.streams)
+        return self.result_groups[self.students.body.index(student)] is not None

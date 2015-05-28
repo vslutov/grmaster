@@ -20,28 +20,16 @@
 
 from grmaster import data
 from grmaster.manager import Manager
-from grmaster.rules import divide
-from grmaster.rules import english_rule
+from grmaster.rules import divide, add_english_rule
 
 STUDENTS_FILE = data.openfile('students.csv')
 
 def test_divide():
     """Test internal function divide."""
-    elems = set(range(10))
-    division = divide(elems, 4)
-    assert isinstance(division, list)
-    assert len(division) == 4
-    assert isinstance(division[0], set)
-    assert isinstance(division[1], set)
-    assert isinstance(division[2], set)
-    assert isinstance(division[3], set)
-    assert division[0] | division[1] | division[2] | division[3] == elems
-    assert len(division[0]) == 3
-    assert len(division[1]) == 3
-    assert len(division[2]) == 2
-    assert len(division[3]) == 2
+    assert divide(50, 4) == [13, 13, 12, 12]
+    assert divide(5, 6) == [1, 1, 1, 1, 1, 0]
 
-class TestRules:
+class TestEnglishRule:
 
     """Test case for `grmaster.rules`."""
 
@@ -51,14 +39,37 @@ class TestRules:
         """Init data from test set."""
         STUDENTS_FILE.seek(0)
         self.manager = Manager(STUDENTS_FILE)
+        assert len(self.manager.add_chain) == 0
+        assert len(self.manager.rule_chain) == 0
+        add_english_rule(self.manager)
+        assert len(self.manager.rule_chain) == 1
+        assert len(self.manager.add_chain) == 1
 
-    def test_rules_english_rule(self):
-        """Test case for `english_rule`."""
-        english_rule(self.manager)
-        assert self.manager.get_assigned_count() == len(self.manager.students)
 
-        english_index = self.manager.students.header.index('Английский')
-        for stream in self.manager.streams:
-            for group in stream:
-                levels = len(set(student[english_index] for student in group))
-                assert 1 <= levels <= 2
+
+    def test_english_rule_can_study(self):
+        """Test that student can study in some groups. Not all."""
+        student = self.manager.students[0]
+        assert any(self.manager.can_study(student, group)
+                   for group in self.manager.group_ids)
+        assert not all(self.manager.can_study(student, group)
+                       for group in self.manager.group_ids)
+
+    def test_english_rule_add_student(self):
+        """We can add student in some group."""
+        student = self.manager.students[0]
+        for group in self.manager.group_ids:
+            if self.manager.can_study(student, group):
+                assert self.manager.add_student(student, group)
+            else:
+                assert not self.manager.add_student(student, group)
+
+    def test_english_rule_add_everybody(self):
+        """We can add all students."""
+        for student in self.manager.students:
+            for group in self.manager.group_ids:
+                if self.manager.can_study(student, group):
+                    self.manager.add_student(student, group)
+                    break
+        for student in self.manager.students:
+            assert self.manager.is_assigned(student)
