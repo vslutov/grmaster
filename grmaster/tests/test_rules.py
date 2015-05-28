@@ -20,7 +20,7 @@
 
 from grmaster import data
 from grmaster.manager import Manager
-from grmaster.rules import divide, add_english_rule
+from grmaster.rules import divide, add_english
 
 STUDENTS_FILE = data.openfile('students.csv')
 
@@ -39,11 +39,11 @@ class TestEnglishRule:
         """Init data from test set."""
         STUDENTS_FILE.seek(0)
         self.manager = Manager(STUDENTS_FILE)
-        assert len(self.manager.add_chain) == 0
+        assert len(self.manager.assign_chain) == 0
         assert len(self.manager.rule_chain) == 0
-        add_english_rule(self.manager)
+        add_english(self.manager)
         assert len(self.manager.rule_chain) == 1
-        assert len(self.manager.add_chain) == 1
+        assert len(self.manager.assign_chain) == 1
 
 
 
@@ -55,21 +55,21 @@ class TestEnglishRule:
         assert not all(self.manager.can_study(student, group)
                        for group in self.manager.group_ids)
 
-    def test_english_rule_add_student(self):
+    def test_english_rule_assign_student(self):
         """We can add student in some group."""
         student = self.manager.students[0]
         for group in self.manager.group_ids:
             if self.manager.can_study(student, group):
-                assert self.manager.add_student(student, group)
+                assert self.manager.assign_student(student, group)
             else:
-                assert not self.manager.add_student(student, group)
+                assert not self.manager.assign_student(student, group)
 
-    def test_english_rule_add_everybody(self):
+    def test_english_rule_assign_everybody(self):
         """We can add all students."""
         for student in self.manager.students:
             for group in self.manager.group_ids:
                 if self.manager.can_study(student, group):
-                    self.manager.add_student(student, group)
+                    self.manager.assign_student(student, group)
                     break
         for student in self.manager.students:
             assert self.manager.is_assigned(student)

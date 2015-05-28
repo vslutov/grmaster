@@ -54,8 +54,8 @@ def main(argv=tuple(sys.argv), file=sys.stdout, grmaster_http_app=server.APP):
     elif len(argv) == 3 and argv[1] == 'divide':
         with open(argv[2], 'r') as input_file:
             manager = Manager(input_file)
-        rules.add_english_rule(manager)
-        print(manager.students.to_csv(), file=file)
+        rules.apply_all(manager)
+        print(manager.get_result().to_csv(), file=file)
     elif len(argv) == 2 and argv[1] == 'server':
         server.run(app=grmaster_http_app)
     elif len(argv) == 2 and argv[1] == 'test':

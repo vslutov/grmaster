@@ -18,11 +18,8 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from itertools import product
 import random
-
 from grmaster.manager import set_item, get_item
-from sys import exit
 
 def divide(elem_count, group_count):
     """Random divide elems into groups."""
@@ -78,7 +75,7 @@ def english_rule(manager, student, group):
             return True
     return False
 
-def english_add(manager, student, group):
+def english_assign(manager, student, group):
     """Try to add student to group."""
     index = manager.meta['_english_index']
     if manager.can_study(student, group):
@@ -88,8 +85,16 @@ def english_add(manager, student, group):
                 return True
     return False
 
-def add_english_rule(manager):
+def add_english(manager):
     """Add english rule for futher using."""
     init_meta_english_groups(manager)
     manager.rule_chain.append(english_rule)
-    manager.add_chain.append(english_add)
+    manager.assign_chain.append(english_assign)
+
+def assign_friends(manager):
+    """First, assign friends."""
+
+def apply_all(manager):
+    """Apply all rules in right sequence"""
+    add_english(manager)
+    manager.assign_all()

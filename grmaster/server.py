@@ -38,7 +38,7 @@ def template():
 
 @APP.route('/result.csv', methods=['POST'])
 def result():
-    """Calc and return."""
+    """Calc and return result."""
     if 'studentfile' not in request.files:
         abort(400)
 
@@ -48,8 +48,8 @@ def result():
         temp_file.seek(0)
         manager = Manager(temp_file)
 
-    rules.english_rule(manager)
-    return Response(manager.students.to_csv(), mimetype='text/csv')
+    rules.apply_all(manager)
+    return Response(manager.get_result().to_csv(), mimetype='text/csv')
 
 def run(app=APP):
     """Run app."""

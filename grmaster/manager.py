@@ -49,7 +49,7 @@ class Manager:
         self.config = {}
         self.meta = {}
         self.rule_chain = []
-        self.add_chain = []
+        self.assign_chain = []
 
         reader = csv.reader(students_file)
 
@@ -66,7 +66,7 @@ class Manager:
 
                 self.config[name] = content
 
-        self.stream_sizes = [int(x) for x in self.config['streams_info']]
+        self.stream_sizes = [int(x) for x in self.config['stream_sizes']]
         self.group_ids = [[stream, group]
                           for stream in range(len(self.stream_sizes))
                           for group in range(self.stream_sizes[stream])]
@@ -84,10 +84,10 @@ class Manager:
         """Functional part is in rule module. Just call it."""
         return all(rule(self, student, group) for rule in self.rule_chain)
 
-    def add_student(self, student, group):
+    def assign_student(self, student, group):
         """Test and add."""
         if self.can_study(student, group):
-            if all(add(self, student, group) for add in self.add_chain):
+            if all(add(self, student, group) for add in self.assign_chain):
                 self.result_groups[self.students.body.index(student)] = group
                 return True
         return False
@@ -95,3 +95,23 @@ class Manager:
     def is_assigned(self, student):
         """Return True, if student is assigned to some stream."""
         return self.result_groups[self.students.body.index(student)] is not None
+
+    def assign_all(self):
+        """Assign all students."""
+        for student in self.students:
+            if not self.is_assigned(student):
+                for group in self.group_ids:
+                    if self.assign_student(student, group):
+                        break
+
+    def group_name(self, group):
+        """list -> str"""
+        return str(100 + sum(self.stream_sizes[:group[0]]) + group[1] + 1)
+
+    def get_result(self):
+        """Write result_groups into students table."""
+        students = [self.students.header + ('Group',)]
+        for i in range(len(self.students)):
+            students.append(self.students[i] +
+                            (self.group_name(self.result_groups[i]), ))
+        return Table(students)

@@ -19,7 +19,29 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from grmaster import data
-from grmaster.manager import Manager
+from grmaster.manager import Manager, get_item, set_item
+
+def test_get_item():
+    """Full test."""
+    a = [[1, 2], [3, 4]]
+    assert get_item(a, [0, 0]) == 1
+    assert get_item(a, [0, 1]) == 2
+    assert get_item(a, [1, 0]) == 3
+    assert get_item(a, [1, 1]) == 4
+    assert get_item(a, [0]) == [1, 2]
+    assert get_item(a, [1]) == [3, 4]
+
+def test_set_item():
+    """Small test."""
+    a = [[1, 2], [3, 4]]
+    set_item(a, [0, 0], 5)
+    assert a == [[5, 2], [3, 4]]
+    set_item(a, [0, 1], 5)
+    assert a == [[5, 5], [3, 4]]
+    set_item(a, [1, 0], 5)
+    assert a == [[5, 5], [5, 4]]
+    set_item(a, [1, 1], 5)
+    assert a == [[5, 5], [5, 5]]
 
 class TestManager:
 
@@ -40,24 +62,19 @@ class TestManager:
         assert all(self.manager.can_study(self.student, group)
                    for group in self.manager.group_ids)
 
-    def test_manager_add_student(self):
+    def test_manager_assign_student(self):
         """Constant method."""
-        self.manager.add_student(self.student, [0, 0])
+        self.manager.assign_student(self.student, [0, 0])
         assert self.manager.is_assigned(self.student)
         assert self.manager.result_groups[0] == [0, 0]
 
     def test_manager_is_assigned(self):
         """After assignation."""
         assert not self.manager.is_assigned(self.student)
-        self.manager.add_student(self.student, [0, 0])
+        self.manager.assign_student(self.student, [0, 0])
         assert self.manager.is_assigned(self.student)
 
-    def test_manager_add_everybody(self):
-        """We can assign everybody."""
-        for student in self.manager.students:
-            for group in self.manager.group_ids:
-                if self.manager.can_study(student, group):
-                    self.manager.add_student(student, group)
-                    break
+    def test_manager_assign_all(self):
+        self.manager.assign_all()
         for student in self.manager.students:
             assert self.manager.is_assigned(student)
