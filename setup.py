@@ -22,7 +22,7 @@ import os
 from setuptools import setup, find_packages, Command
 
 setup(name='grmaster',
-      version='0.1.2',
+      version='0.1.3',
       description=__doc__,
       maintainer='vslutov',
       maintainer_email='vslutov@yandex.ru',
