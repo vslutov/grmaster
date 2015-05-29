@@ -18,7 +18,7 @@
 #   You should have received a copy of the GNU Affero General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import random
+import random, sys
 from grmaster.manager import set_item, get_item
 
 def divide(elem_count, group_count):
@@ -26,7 +26,6 @@ def divide(elem_count, group_count):
     sizes = [elem_count // group_count] * group_count
     prefix = elem_count % group_count
     sizes[:prefix] = [elem_count // group_count + 1] * prefix
-    print(elem_count, group_count)
     return sizes
 
 def init_meta_english_groups(manager):
@@ -93,18 +92,38 @@ def english_rule(manager, student, group):
 def english_assign(manager, student, group):
     """Try to add student to group."""
     index = manager.meta['_english_index']
-    if manager.can_study(student, group):
-        for en_box in get_item(manager.meta['_english_groups'], group):
-            if en_box[0] == student[index] and en_box[1] > 0:
-                en_box[1] -= 1
-                return True
-    return False
+    for en_box in get_item(manager.meta['_english_groups'], group):
+        if en_box[0] == student[index] and en_box[1] > 0:
+            en_box[1] -= 1
+            return True
 
 def add_english(manager):
     """Add english rule and add for futher using."""
     init_meta_english_groups(manager)
     manager.rule_chain.append(english_rule)
     manager.assign_chain.append(english_assign)
+
+def get_wishes_count(manager):
+    """Return count of filled wishes."""
+    all_wishes = filled_wishes = 0
+    if '_wishes' in manager.meta:
+        meta_wishes = manager.meta['_wishes']
+        for i in range(len(manager.students)):
+            if meta_wishes[i] is not None:
+                all_wishes += 1
+                if manager.result_groups[i][0] == meta_wishes[i]:
+                    filled_wishes += 1
+    if 'friends_table' in manager.config:
+        friends_table = manager.meta[manager.config['friends_table'][0]]
+        for row in friends_table:
+            all_wishes += 1
+            student_one = manager.students.get_by_column(0, row[0])
+            student_one = manager.students.body.index(student_one)
+            student_two = manager.students.get_by_column(0, row[1])
+            student_two = manager.students.body.index(student_two)
+            if manager.result_groups[student_one] == manager.result_groups[student_two]:
+                filled_wishes += 1
+    return [filled_wishes, all_wishes]
 
 def assign_friends(manager):
     """First, assign friends."""
@@ -114,8 +133,7 @@ def assign_wishes(manager):
     if '_wishes' in manager.meta:
         meta_wishes = manager.meta['_wishes']
         wishes = []
-        has_score = 'score' in manager.config
-        print(has_score)
+        has_score = 'score_header' in manager.config
         if has_score:
             score_index = manager.students.header.index(manager.config['score_header'][0])
         for i in range(len(manager.students)):
@@ -139,3 +157,4 @@ def apply_all(manager):
     assign_friends(manager)
     assign_wishes(manager)
     manager.assign_all()
+    print(get_wishes_count(manager), file=sys.stderr)
