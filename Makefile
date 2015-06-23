@@ -1,6 +1,8 @@
 SRC_DIR = grmaster
 GENERATED = build dist *.egg-info
 
+all : test lint pep257
+
 clean :
 	rm -rf $(GENERATED)
 
@@ -18,5 +20,3 @@ lint :
 
 pep257 :
 	pep257 $(SRC_DIR)
-
-all : test lint pep257
